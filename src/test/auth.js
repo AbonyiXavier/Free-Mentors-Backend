@@ -62,4 +62,51 @@ describe("User authenticatation process", () => {
       expect(res.body).to.have.property("message");
     });
   });
+
+  describe("Testing the login method", () => {
+    it("should return a validation error", async () => {
+      const res = await chai
+        .request(server)
+        .post(`${url}/signin`)
+        .send({
+          email: "xa.com",
+          password: "12"
+        });
+      expect(res).to.have.status(400);
+    });
+
+    it("should return Email and password does not match", async () => {
+      const res = await chai
+        .request(server)
+        .post(`${url}/signin`)
+        .send({
+          email: "g@gmail.com",
+          password: "456789"
+        });
+      expect(res).to.have.status(400);
+    });
+
+    it("should login a user successfully", async () => {
+      const res = await chai
+        .request(server)
+        .post(`${url}/signin`)
+        .send({
+          email: "d@gmail.com",
+          password: "1234567"
+        });
+      expect(res).to.have.status(200);
+      expect(res.body).to.have.property("message");
+    });
+
+    it("should return Email does not exits", async () => {
+      const res = await chai
+        .request(server)
+        .post(`${url}/signin`)
+        .send({
+          email: "g@.com",
+          password: "123456"
+        });
+      expect(res).to.have.status(400);
+    });
+  });
 });
