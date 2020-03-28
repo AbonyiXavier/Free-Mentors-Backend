@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import signUp from "./routes/user";
 import signIn from "./routes/user";
+import updateUser from "./routes/updateUser";
 require("dotenv").config();
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(cookieParser());
 
 app.use("/auth", signUp);
 app.use("/auth", signIn);
+app.use("/api", updateUser);
 const PORT = process.env.PORT || 9090;
 
 const server = app.listen(PORT, () => {
