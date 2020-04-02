@@ -53,33 +53,50 @@ export default class userController {
               res.send(error);
             } else {
               user.password = hash;
-              const saveNewUser = "INSERT INTO user SET ?";
-              dbConnection.query(
-                saveNewUser,
-                user,
-                (error, results, fields) => {
-                  if (error) {
-                    res.send({
-                      status: "error"
-                    });
-                  } else {
-                    // console.log(id);
-                    const token = jwt.sign(user, process.env.TOKEN_SECRET, {
-                      // expiresIn: "3600s" // 1min
-                    });
-                    res.cookie("token", token);
-                    res
-                      .header("auth-token", token)
-                      .status(201)
-                      .json({
-                        token,
-                        message: "User created Successful",
-                        user
+              if (user.role === "mentor") {
+                const saveNewUser = "INSERT INTO user SET ?";
+                dbConnection.query(
+                  saveNewUser,
+                  user,
+                  (error, results, fields) => {
+                    if (error) {
+                      console.log("you love error", error);
+                      res.send({
+                        status: "error"
                       });
+                    } else {
+                      const userId = results.insertId;
+                      dbConnection.query(
+                        "INSERT INTO mentor SET ?",
+                        { userId },
+                        function(err, reseults, fields) {
+                          if (err) {
+                            console.log("need my error", err);
+                          }
+                          // console.log(id);
+                          const token = jwt.sign(
+                            user,
+                            process.env.TOKEN_SECRET,
+                            {
+                              // expiresIn: "3600s" // 1min
+                            }
+                          );
+                          res.cookie("token", token);
+                          res
+                            .header("auth-token", token)
+                            .status(201)
+                            .json({
+                              token,
+                              message: "User created Successful",
+                              user
+                            });
+                        }
+                      );
+                    }
+                    //   console.log(results)
                   }
-                  //   console.log(results);
-                }
-              );
+                );
+              }
             }
           });
         }
